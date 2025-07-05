@@ -4,8 +4,8 @@ import { store } from "../store.ts";
 import { allFriends } from "../friends.ts";
 import { allRooms, roomKey } from "../rooms.ts";
 
-function reset() {
-  if (window.confirm("Are you sure you want to reset your progress? This cannot be undone.") && window.confirm("Double checking: Are you sure you want to reset your progress? This cannot be undone.")) {
+async function reset() {
+  if (await window.confirm("Are you sure you want to reset your progress? This cannot be undone.") && await window.confirm("Double checking: Are you sure you want to reset your progress? This cannot be undone.")) {
     localStorage.clear();
     window.location.reload();
   }

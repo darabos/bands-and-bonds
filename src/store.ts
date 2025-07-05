@@ -195,8 +195,8 @@ function addDamage(x: number) {
   }
 }
 
-export function takeTurn(turn: string, skipConfirmation?: boolean) {
-  if (!skipConfirmation && !window.confirm(`${turn}?`)) return;
+export async function takeTurn(turn: string, skipConfirmation?: boolean) {
+  if (!skipConfirmation && !await window.confirm(`${turn}?`)) return;
   store.run.room = startingRoomData();
   store.run.steps += 1;
   if (turn !== 'Keep going') {

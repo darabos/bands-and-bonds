@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { store, startingRunData, takeTurn, describeAbility, nextTo, onboard, bandByName, getAbilityDamage } from "../store.ts";
+import { store, startingRunData, takeTurn, describeAbility, nextTo, onboard, getAbilityDamage } from "../store.ts";
 import { friendsByName } from "../friends.ts";
 import type { Ability, Friend, Turn, Enemy } from "../base.ts";
 import SlowButton from "./SlowButton.vue";
@@ -85,8 +85,8 @@ const fighting = computed(() => {
   return enemy.value && store.run.room.damage < enemy.value.health;
 });
 
-function retreat() {
-  if (window.confirm("Are you sure you want to retreat?")) {
+async function retreat() {
+  if (await window.confirm("Are you sure you want to retreat?")) {
     Object.assign(store.run, startingRunData());
     for (const friend in store.bandByName()) {
       const f = friendsByName[friend];
