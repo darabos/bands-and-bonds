@@ -36,6 +36,9 @@ const abilities = computed(() => {
 });
 
 function executeAbility(ab: Ability) {
+  if (!ab.name.includes('Illum') && !ab.name.includes("orge")) {
+    console.log("Executing ability:", ab.name);
+  }
   if (ab.onCompleted) {
     return ab.onCompleted(store, ab);
   }
@@ -251,7 +254,7 @@ for (const url of [
       <SlowButton v-if="store.run.steps > 0 && (fighting || ab.peaceful)" :timer-key="`ability-${ab.name}`"
         :title="ab.name" :description="describeAbility(ab)" :cost="abilityPrice(ab)"
         :image="`images/generated/${ab.image ?? ab.name}.webp`" :duration="ab.duration * 1000"
-        @done="executeAbility(ab)" :autostart="ab.automatic" />
+        @done="if (ab.name.includes('Grow')) console.log('done', ab); executeAbility(ab)" :autostart="ab.automatic" />
     </template>
     <div v-if="store.run.capturedMonsters.length > 0" class="section">Captured Monsters</div>
     <template v-for="monster in store.run.capturedMonsters" :key="monster">

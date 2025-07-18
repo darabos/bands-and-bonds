@@ -13,8 +13,8 @@ export default class Game {
     this.packsUsed = 1;
   }
   async setup() {
-    this.page.setDefaultTimeout(1_000);
-    await this.page.goto('/?test', { timeout: 10_000 });
+    this.page.setDefaultTimeout(10_000);
+    await this.page.goto('/', { timeout: 10_000 });
     await this.page.addStyleTag({ path: 'tests/test-overrides.css' });
     this.page.on('dialog', async (dialog) => { await dialog.accept() });
     await expect(this.page).toHaveTitle(/Bands & Bonds/);
@@ -106,6 +106,7 @@ export default class Game {
       this.clicks++;
       await this.button("Grow Guns").click();
       this.clicks++;
+      await this.page.pause();
       await expect(this.button("Fire Xaranthian Guns")).toBeVisible();
       await this.button("Grow Guns").hover();
       await this.page.mouse.down();

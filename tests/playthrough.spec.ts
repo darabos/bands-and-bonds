@@ -610,7 +610,7 @@ test('next steps', async ({ page }) => {
     await game.addToBand('Kin of Pump');
     await game.addToBand('Xaranthian Constructor');
     // TODO: Find out why Growers don't work when Stick Master is not in the band.
-    await game.addToBand('Stick Master');
+    // await game.addToBand('Stick Master');
   });
 
   await game.run(async () => {
@@ -622,7 +622,7 @@ test('next steps', async ({ page }) => {
     await game.waitToDefeatEnemy('Frozen Centurion');
     await game.clickButton('Keep going');
     await game.clickButton('Turn right');
-    await game.waitToDefeatEnemy('Geckalog', 20_000);
+    await game.xaranthianDefeatEnemy('Geckalog', 5);
     await game.clickButton('Keep going');
     await game.waitToDefeatEnemy('Jaw Maw Maw', 10_000);
     await game.clickButton('Keep going');

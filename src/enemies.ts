@@ -1,7 +1,7 @@
 import type { Enemy, Ability } from "./base";
 
 export const allEnemies: Enemy[] = [
-  { name: "Wild Slime", health: 10, rewards: { gold: 1, fruit: 1 }, weaknesses: ["fire", "ice", "left", "right"] },
+  { name: "Wild Slime", health: 10, rewards: { gold: 1000000, fruit: 1 }, weaknesses: ["fire", "ice", "left", "right"] },
   { name: "Poison Crow", health: 20, rewards: { gold: 2, fruit: 1 }, weaknesses: ["fire", "ice", "left"] },
   { name: "Animated Skeleton", health: 50, rewards: { gold: 5, fruit: 3 }, weaknesses: ["front", "blunt"] },
   { name: "Thick Door", health: 10, rewards: { gold: 0, fruit: 0 }, armor: 3, weaknesses: ["fire", "blunt", "back"] },
@@ -40,7 +40,7 @@ export const allEnemies: Enemy[] = [
   { name: "Scaffold Sorcery", health: 20_000, armor: 1000, rewards: { gold: 100, fruit: 12 }, weaknesses: ["fire", "axe"] },
   { name: "Lost Swimmer", health: 30_000, armor: 2000, rewards: { fruit: 50 }, immune: ["water"], weaknesses: ["ice"] },
 
-  { name: "Geckalog", health: 80_000, rewards: { gold: 80, fruit: 15 }, weaknesses: ["ice", "left"] },
+  { name: "Skelemasterion", health: 80_000, rewards: { gold: 80, fruit: 15 }, weaknesses: ["ice", "left"], immune: ["light"] },
   { name: "Jaw Maw Maw", health: 60_000, regen: 60, rewards: { gold: 60, fruit: 16 }, passiveEffects: ["Jaw Maw Maw heals quickly."] },
   { name: "Decay Manifest", health: 120_000, rewards: { gold: 20, fruit: 19 }, weaknesses: ["fire", "right"] },
   { name: "Striped Horror", health: 200_000, dodge: 10, rewards: { gold: 10, fruit: 10 } },
@@ -65,7 +65,7 @@ export const allEnemies: Enemy[] = [
   { name: "Core Diver", health: 510_000_000, regen: 80_000, rewards: { gold: 200, fruit: 1000 }, immune: ["fire"], weaknesses: ["water"] },
   { name: "Smother Mother", health: 250_000_000, armor: 800_000, rewards: { gold: 200, fruit: 1500 }, immune: ["fire"], weaknesses: ["left", "water"] },
   { name: "The Final Warden", dodge: 0.1, health: 999_000_000, regen: 600_000, rewards: { gold: 15_000, fruit: 5000 }, immune: ["fire"], weaknesses: ["holy", "ice"] },
-  { name: "Skelemasterion", health: 1_000_000_000, armor: 1_000_000_000, regen: 10_000_000, ethereal: true, rewards: { gold: 1_000_000_000, fruit: 1_000_000_000 }, passiveEffects: ["This dungeon is barely strong enough to contain the invincible Skelemasterion."] },
+  { name: "Geckalog", health: 1_000_000_000, armor: 1_000_000_000, regen: 10_000_000, ethereal: true, rewards: { gold: 1_000_000_000, fruit: 1_000_000_000 }, passiveEffects: ["This dungeon is barely strong enough to contain the invincible Skelemasterion."], immune: ["light"] },
 ];
 
 const enemyAbilities: Record<string, Ability[]> = {

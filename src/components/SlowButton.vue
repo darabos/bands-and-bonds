@@ -15,9 +15,18 @@ const props = defineProps({
 });
 const emit = defineEmits(['done']);
 function done() {
+  if (props.timerKey.includes("Grow")) {
+    console.log("Done with Grow timer:", props.timerKey);
+  }
   emit('done');
+  if (props.timerKey.includes("Grow")) {
+    console.log("Done emitted:", props.timerKey, pointerDown.value);
+  }
   if (props.autostart || pointerDown.value) {
     start();
+    if (props.timerKey.includes("Grow")) {
+      console.log("restarted:", props.timerKey);
+    }
   }
 }
 function start() {
@@ -65,14 +74,23 @@ watch(affordable, (newVal) => {
 const running = computed(() => {
   return !!store.run.timers[props.timerKey];
 });
+const previousCallback = store.timerCallbacks[props.timerKey];
 onMounted(() => {
+  console.log('SlowButton mounted:', props.timerKey);
   store.timerCallbacks[props.timerKey] = done;
   if (props.autostart) {
     start();
   }
 });
 onUnmounted(() => {
-  delete store.timerCallbacks[props.timerKey];
+  console.log('SlowButton unmounted:', props.timerKey);
+  if (store.timerCallbacks[props.timerKey] === done) {
+    if (previousCallback) {
+      store.timerCallbacks[props.timerKey] = previousCallback;
+    } else {
+      delete store.timerCallbacks[props.timerKey];
+    }
+  }
   if (store.run.timers[props.timerKey]) {
     delete store.run.timers[props.timerKey];
     // Refund price.
@@ -81,12 +99,14 @@ onUnmounted(() => {
   }
 });
 const pointerDown = ref(false);
+console.log('SlowButton setup:', props.timerKey, props.autostart);
 </script>
 
 <template>
   <button @click="start()" @pointerdown="pointerDown = true; start();" @pointerup="pointerDown = false"
     @pointercancel="pointerDown = false" @pointerleave="pointerDown = false" :style="style()"
     :class="{ disabled: !affordable || running }" class="slow">
+    {{ pointerDown }}
     <img v-bind:src="props.image" />
     <div class="text">
       <div class="cost" v-if="(props.cost.gold ?? 0) > 0" :class="{ unaffordable: !affordable && !running }">

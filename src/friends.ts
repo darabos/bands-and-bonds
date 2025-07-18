@@ -17,8 +17,8 @@ The starting weapon level is the square root of the highest level achieved.
     `,
     abilities: [{
       name: "Forge",
-      duration: 5,
-      consumes: { gold: 1 },
+      duration: 50,
+      consumes: { gold: 0 },
       description: (store) => `Increases the level of all weapons. (Currently ${numberSpan(store.weaponLevel())}.)`,
       onCompleted(store) {
         store.run.weaponLevelAdded += 1;
@@ -625,7 +625,7 @@ a Xaranthian person, and neither has anyone else in your band.
     abilities: [{
       name: "Construct Grower",
       consumes: { gold: 10 },
-      duration: 5,
+      duration: .5,
       description: (store) =>
         `Construct a mechanical grower.${store.run.room.xaranthian.growers ? ` (Currently ${numberSpan(store.run.room.xaranthian.growers)} growers.)` : ''}`,
       onCompleted(store) {
@@ -635,7 +635,7 @@ a Xaranthian person, and neither has anyone else in your band.
       name: "Grow Gun",
       consumes: { gold: 10 },
       hidden: (store) => store.run.room.xaranthian.growers !== 1,
-      duration: 5,
+      duration: .5,
       description: (store) =>
         `Grow a mechanical gun.${store.run.room.xaranthian.guns ? ` (Currently ${numberSpan(store.run.room.xaranthian.guns)} guns.)` : ''}`,
       onCompleted(store) {
@@ -645,10 +645,11 @@ a Xaranthian person, and neither has anyone else in your band.
       name: "Grow Guns",
       consumes: { gold: 10 },
       hidden: (store) => store.run.room.xaranthian.growers < 2,
-      duration: 5,
+      duration: .5,
       description: (store) =>
         `Grow ${numberSpan(store.run.room.xaranthian.growers)} mechanical guns.${store.run.room.xaranthian.guns ? ` (Currently ${numberSpan(store.run.room.xaranthian.guns)} guns.)` : ''}`,
       onCompleted(store) {
+        console.log('grow guns', store.run.room.xaranthian.growers, store.run.room.xaranthian.guns);
         store.run.room.xaranthian.guns += store.run.room.xaranthian.growers;
       }
     }, {

@@ -42,6 +42,9 @@ function mainLoop() {
       t.time += Math.floor(deltaTime * store.run.speedLevel);
     }
     if (t.time >= t.duration) {
+      if (key.includes("Grow")) {
+        console.log("Timer completed:", key, t.time, t.duration, store.timerCallbacks[key]);
+      }
       // Fire the callback.
       t.time -= t.duration;
       delete store.run.timers[key];
