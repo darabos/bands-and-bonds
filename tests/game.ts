@@ -58,7 +58,7 @@ export default class Game {
   async waitToDefeatEnemy(name: string, timeout = 5_000) {
     // Does nothing until the enemy is defeated.
     await test.step(`Defeat ${name} passively`, async () => {
-      await expect(this.page.getByRole('heading', { name })).toBeVisible();
+      await expect(this.page.getByRole('heading', { name })).toBeVisible({ timeout });
       await expect(this.page.getByText('Defeated')).toBeVisible({ timeout });
     });
   }
@@ -83,15 +83,33 @@ export default class Game {
       }
     });
   }
-  async waitForNumberToReach(counter: Locator, target: number) {
-    await expect.poll(async () => {
+  async waitForFruitAtLeast(count: number) {
+    const fruitCounter = this.page.locator('#header-fruit');
+    await this.waitForNumberAtLeast(fruitCounter, count);
+  }
+  async waitForGoldAtMost(count: number) {
+    const goldCounter = this.page.locator('#header-gold');
+    await this.waitForNumberAtMost(goldCounter, count);
+  }
+  waitForNumber(counter: Locator, re?: RegExp) {
+    return expect.poll(async () => {
       const text = await counter.textContent();
-      const match = text?.match(/Currently ([0-9,]+)/);
+      const match = text?.match(re || /.*?([0-9,]+)/);
       return match ? Number.parseInt(match[1].replace(/,/g, ''), 10) : 0;
     }, {
-      message: `waiting for counter to reach ${target}`,
+      message: "waiting for counter",
       timeout: 10_000,
-    }).toBeGreaterThanOrEqual(target);
+    });
+  }
+  async waitForNumberAtMost(counter: Locator, target: number) {
+    await this.waitForNumber(counter).toBeLessThanOrEqual(target);
+  }
+  async waitForNumberAtLeast(counter: Locator, target: number) {
+    await this.waitForNumber(counter).toBeGreaterThanOrEqual(target);
+  }
+  async waitForWeaponLevel(target: number) {
+    const forgeButton = this.page.getByRole("button").filter({ hasText: 'Forge' });
+    await this.waitForNumber(forgeButton, /.*?Currently ([0-9,]+)/).toBeGreaterThanOrEqual(target);
   }
   async xaranthianDefeatEnemy(enemy: string, quota: number, timeout = 5_000) {
     await test.step(`Defeat ${enemy} the Xaranthian way`, async () => {
@@ -101,7 +119,7 @@ export default class Game {
       await expect(this.button("Grow Gun").or(this.button("Grow Guns"))).toBeVisible();
       await this.button("Construct Grower").hover();
       await this.page.mouse.down();
-      await this.waitForNumberToReach(this.button("Construct Grower"), quota);
+      await this.waitForNumberAtLeast(this.button("Construct Grower"), quota);
       await this.page.mouse.up();
       this.clicks++;
       await this.button("Grow Guns").click();
@@ -109,7 +127,7 @@ export default class Game {
       await expect(this.button("Fire Xaranthian Guns")).toBeVisible();
       await this.button("Grow Guns").hover();
       await this.page.mouse.down();
-      await this.waitForNumberToReach(this.button("Grow Guns"), quota * quota);
+      await this.waitForNumberAtLeast(this.button("Grow Guns"), quota * quota);
       await this.page.mouse.up();
       this.clicks++;
       await this.button("Fire Xaranthian Guns").hover();
@@ -211,6 +229,17 @@ export default class Game {
       await this.tab('Fight');
     });
   }
+  async setDestination(enemy: string) {
+    await this.tab('Map');
+    await this.page.locator(`.marker[alt="${enemy}"]`).click();
+    await this.tab('Fight');
+  }
+  async stopTraveling() {
+    await this.tab('Map');
+    await this.page.getByText("Stop traveling").click();
+    await this.tab('Fight');
+  }
+
   async saveState(filename: string) {
     const localStorageData = await this.page.evaluate(() => {
       return Object.fromEntries(Object.entries(localStorage));

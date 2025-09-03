@@ -118,15 +118,30 @@ test('playthrough', async ({ page }) => {
     await game.clickButton('Keep going');
     await game.rescue('Royal Fruitbearer');
   });
-  await game.run(7, async () => {
+  await game.manageBand(async () => {
+    await game.removeFromBand('Lamplighter');
+    await game.addToBand('Lamplighter');
+    await game.addToBand('Stick Master');
+    await game.addToBand('The Silent Song');
+    await game.addToBand('Kin of Pump');
+    await game.addToBand('Royal Fruitbearer');
+  });
+  await game.run(3, async () => {
     await game.defeatEnemy('Wild Slime');
     await game.clickButton('Keep going');
-    await game.clickButton('Go straight');
-    await game.defeatEnemy('Dead Gladiator');
+    await game.clickButton('Turn right');
+    await game.defeatEnemy('Poison Crow');
+    await game.clickButton('Keep going');
+    await game.defeatEnemy('Animated Skeleton');
   });
-
   await game.manageBand(async () => {
+    await game.removeFromBand('Lamplighter');
+    await game.addToBand('Lamplighter');
+    await game.addToBand('Friend of Metal');
+    await game.addToBand('The Silent Song');
+    await game.addToBand('Anvilomancer');
     await game.addToBand('Kin of Pump');
+    await game.addToBand('Stick Master');
   });
   await game.run(async () => {
     await game.defeatEnemy('Wild Slime');
@@ -148,33 +163,40 @@ test('playthrough', async ({ page }) => {
     await game.clickButton('Keep going');
   });
   await game.manageBand(async () => {
-    await game.removeFromBand('Anvilomancer');
-    await game.removeFromBand('The Silent Song');
-    await game.removeFromBand('Friend of Metal');
+    await game.removeFromBand('Lamplighter');
+    await game.addToBand('Lamplighter');
     await game.addToBand('Stick Master');
     await game.addToBand('Lord of Gears');
     await game.addToBand('Royal Fruitbearer');
     await game.addToBand('The Silent Song');
+    await game.addToBand('Kin of Pump');
   });
-
-  const shortWithGears = async () => {
-    await game.waitToDefeatEnemy('Wild Slime');
+  await game.run(async () => {
+    await game.defeatEnemy('Wild Slime');
     await game.clickButton('Keep going');
-    await game.clickButton('Turn right');
-    await game.waitToDefeatEnemy('Poison Crow');
+    await game.clickButton('Go straight');
+    await game.defeatEnemy('Dead Gladiator');
+  });
+  await game.manageBand(async () => {
+    await game.addToBand('Dark Chef');
+  });
+  await game.run(3, async () => {
+    await game.defeatEnemy('Wild Slime');
     await game.clickButton('Keep going');
-    await game.waitToDefeatEnemy('Animated Skeleton');
-  }
-  await game.run(8, shortWithGears);
+    await game.clickButton('Go straight');
+    await game.defeatEnemy('Dead Gladiator');
+  });
 
   await game.manageBand(async () => {
     await game.removeFromBand('Lamplighter');
     await game.addToBand('Lamplighter');
-    await game.addToBand('Lord of Gears');
-    await game.addToBand('Anvilomancer');
-    await game.addToBand('Silent Song');
-    await game.addToBand('Dark Chef');
     await game.addToBand('Friend of Metal');
+    await game.addToBand('The Silent Song');
+    await game.addToBand('Dark Chef');
+    await game.addToBand('Lord of Gears');
+    await game.addToBand('Kin of Pump');
+    await game.addToBand('Anvilomancer');
+    await game.addToBand('Stick Master');
   });
   await game.run(async () => {
     await game.defeatEnemy('Wild Slime');
@@ -217,39 +239,6 @@ test('playthrough', async ({ page }) => {
     await game.clickButton('Open door');
     await game.rescue('Pecquer');
   });
-  await game.manageBand(async () => {
-    await game.removeFromBand('Friend of Metal');
-    await game.addToBand('Pecquer');
-  });
-  await game.run(async () => {
-    await game.defeatEnemy('Wild Slime');
-    await game.clickButton('Keep going');
-    await game.clickButton('Go straight');
-    await game.defeatEnemy('Dead Gladiator');
-    await game.clickButton('Turn left');
-    await game.clickButton('Keep going');
-    await game.defeatEnemy('Lobster Daddy');
-    await game.clickButton('Keep going');
-    await game.clickButton('Keep going');
-    await game.defeatEnemy('Will-o-Wasp');
-    await game.clickButton('Turn left');
-    await game.defeatEnemy('Glass Dragon');
-    await game.clickButton('Keep going');
-    await game.clickButton('Sneak Past');
-    await game.clickButton('Go straight');
-    await game.clickButton('Go straight');
-    await game.clickButton('Open door');
-    await game.defeatEnemy('Fortified Door');
-    await game.clickButton('Keep going');
-    await game.rescue('Knight of Claws');
-  });
-  await game.manageBand(async () => {
-    await game.removeFromBand('Lamplighter');
-    await game.addToBand('Lamplighter');
-    await game.addToBand('Anvilomancer');
-    await game.addToBand('Knight of Claws', 1);
-    await game.addToBand('Dark Chef', 1);
-  });
 
   await game.run(async () => {
     await game.defeatEnemy('Wild Slime');
@@ -264,7 +253,7 @@ test('playthrough', async ({ page }) => {
     await game.clickButton('Keep going');
     await game.defeatEnemy('Jaw Maw Maw');
     await game.clickButton('Keep going');
-    await game.defeatEnemy("Decay Manifest");
+    await game.defeatEnemy("Gnollish Ambassador");
     await game.clickButton('Keep going');
     await game.rescue('Wayfinder');
     await game.clickButton('Keep going');
@@ -272,6 +261,144 @@ test('playthrough', async ({ page }) => {
     await game.clickButton('Keep going');
     await game.rescue('Desert Rabbit');
   });
+
+  // Fruit run.
+  await game.manageBand(async () => {
+    await game.removeFromBand('Lamplighter');
+    await game.addToBand('Lamplighter');
+    await game.addToBand('Dark Chef');
+    await game.addToBand('Wayfinder');
+    await game.addToBand('Royal Fruitbearer');
+    await game.addToBand('Lord of Gears');
+    await game.addToBand('Kin of Pump');
+    await game.addToBand('Stick Master');
+    await game.addToBand('The Silent Song');
+  });
+  await game.setDestination('Dead Gladiator');
+  await game.run(async () => {
+    await game.waitForFruitAtLeast(10_000);
+    await game.stopTraveling();
+  });
+
+  // Push left.
+  await game.manageBand(async () => {
+    await game.removeFromBand('Lamplighter');
+    await game.addToBand('Lamplighter');
+    await game.addToBand('Dark Chef');
+    await game.addToBand('The Silent Song');
+    await game.addToBand('Friend of Metal');
+    await game.addToBand('Lord of Gears');
+    await game.addToBand('Pecquer');
+    await game.addToBand('Anvilomancer');
+    await game.addToBand('Kin of Pump');
+    await game.addToBand('Wayfinder');
+  });
+  await game.setDestination('Xaranthian Construct');
+  await game.run(async () => {
+    await game.defeatEnemy('Lobster Daddy');
+    await game.waitToDefeatEnemy('Xaranthian Construct', 10_000);
+    await game.clickButton('Keep going');
+    await game.clickButton('Go straight');
+    await game.clickButton('Go straight');
+    await game.clickButton('Open door');
+    await game.defeatEnemy('Fortified Door');
+    await game.clickButton('Keep going');
+    await game.rescue('Knight of Claws');
+    await game.clickButton('Keep going');
+    await game.clickButton('Sneak Past');
+    await game.rescue('Kit Flash');
+  });
+  await game.run(async () => {
+    await game.defeatEnemy('Lobster Daddy');
+    await game.waitToDefeatEnemy('Xaranthian Construct', 10_000);
+    await game.clickButton('Keep going');
+    await game.clickButton('Go straight');
+    await game.clickButton('Go straight');
+    await game.clickButton('Go straight');
+    await game.clickButton('Go straight');
+    await game.clickButton('Sneak Past');
+    await game.rescue('Azrekta');
+    await game.clickButton('Keep going');
+  });
+
+  // Pump up weapon level.
+  await game.manageBand(async () => {
+    await game.removeFromBand('Lamplighter');
+    await game.addToBand('Lamplighter');
+    await game.addToBand('Dark Chef');
+    await game.addToBand('Lord of Gears');
+    await game.addToBand('Anvilomancer');
+    await game.addToBand('The Silent Song');
+    await game.addToBand('Azrekta');
+    await game.addToBand('Kin of Pump', 12);
+  });
+  await game.run(async () => {
+    await game.defeatEnemy('Wild Slime');
+    await game.clickButton('Keep going');
+    await game.clickButton('Go straight');
+    await game.defeatEnemy('Dead Gladiator');
+    await game.waitForWeaponLevel(600);
+  });
+  // Fruit run.
+  await game.manageBand(async () => {
+    await game.removeFromBand('Lamplighter');
+    await game.addToBand('Lamplighter');
+    await game.addToBand('Kin of Pump');
+    await game.addToBand('Royal Fruitbearer', 1);
+    await game.addToBand('Azrekta');
+    await game.addToBand('The Silent Song');
+    await game.addToBand('Stick Master');
+    await game.addToBand('Anvilomancer');
+  });
+  await game.run(5, async () => {
+    await game.defeatEnemy('Wild Slime');
+    await game.clickButton('Keep going');
+    await game.clickButton('Go straight');
+    await game.defeatEnemy('Dead Gladiator');
+  });
+  await game.manageBand(async () => {
+    await game.addToBand('Lord of Gears');
+  });
+  await game.run(5, async () => {
+    await game.defeatEnemy('Wild Slime');
+    await game.clickButton('Keep going');
+    await game.clickButton('Go straight');
+    await game.defeatEnemy('Dead Gladiator');
+  });
+
+  await game.saveState('last state.json');
+});
+test('next steps', async ({ page }) => {
+  const game = new Game(page);
+  await game.setup();
+  await game.loadState('last state.json');
+
+  await game.manageBand(async () => {
+  });
+  return;
+  await game.run(async () => {
+    await game.clickButton('Turn right');
+    await game.defeatEnemy('Frozen Centurion');
+    await game.clickButton('Keep going');
+    await game.clickButton('Turn right');
+    await game.defeatEnemy('Geckalog');
+    await game.clickButton('Keep going');
+    await game.defeatEnemy('Jaw Maw Maw');
+    await game.clickButton('Keep going');
+    await game.defeatEnemy("Gnollish Ambassador");
+    await game.clickButton('Keep going');
+    await game.clickButton('Keep going');
+    await game.defeatEnemy("Striped Horror")
+    await game.clickButton('Keep going');
+    await game.clickButton('Keep going');
+    await game.defeatEnemy("Dragonfly Agaric");
+    await game.clickButton('Keep going');
+    await game.clickButton('Keep going');
+    await game.defeatEnemy("Artifact Seeker")
+    await game.clickButton('Keep going');
+    await game.defeatEnemy("Golden Chest")
+  });
+  return;
 
   await game.manageBand(async () => {
     await game.removeFromBand('Lamplighter');
@@ -695,9 +822,4 @@ test('playthrough', async ({ page }) => {
 
   console.log(`Total clicks: ${game.totalClicks}`);
   await game.saveState('last state.json');
-});
-test('next steps', async ({ page }) => {
-  const game = new Game(page);
-  await game.setup();
-  await game.loadState('last state.json');
 });
