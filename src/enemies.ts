@@ -41,9 +41,9 @@ export const allEnemies: Enemy[] = [
   { name: "Lost Swimmer", health: 30_000, armor: 2_000, rewards: { fruit: 20 }, immune: ["water"], weaknesses: ["ice"] },
 
   { name: "Geckalog", health: 80_000, rewards: { gold: 80, fruit: 15 }, weaknesses: ["ice", "left"] },
-  { name: "Jaw Maw Maw", health: 60_000, regen: 60, rewards: { gold: 60, fruit: 16 }, passiveEffects: ["Jaw Maw Maw heals quickly."] },
-  { name: "Gnollish Ambassador", health: 120_000, armor: 10, rewards: { gold: 20, fruit: 19 }, weaknesses: ["fire", "right"] },
-  { name: "Striped Horror", health: 200_000, dodge: 10, rewards: { gold: 10, fruit: 20 } },
+  { name: "Jaw Maw Maw", health: 60_000, regen: 300, rewards: { gold: 60, fruit: 16 }, passiveEffects: ["Jaw Maw Maw heals quickly."] },
+  { name: "Gnollish Ambassador", health: 120_000, armor: 10, dodge: 3, rewards: { gold: 20, fruit: 19 }, weaknesses: ["fire", "right"] },
+  { name: "Striped Horror", health: 300_000, rewards: { gold: 10, fruit: 20 } },
   {
     name: "Dragonfly Agaric", health: 600_000, rewards: { gold: 20, fruit: 30 }, immune: ["poison"], regen: 3_000, weaknesses: ["fire", "left"],
     passiveEffects: ["The spores of the Dragonfly Agaric are toxic to everything but itself."],
@@ -71,8 +71,8 @@ export const allEnemies: Enemy[] = [
   { name: "The King's Armor", health: 60_000_000, armor: 100_000, rewards: { gold: 8_000 }, immune: ["sharp"], weaknesses: [] },
   { name: "Corridor of Illusions", health: 6_000_000, dodge: 0.01, rewards: { gold: 6_000, fruit: 300 }, weaknesses: ["light"] },
   {
-    name: "Hiber Conduit", health: 100_000_000, regen: 8_000, rewards: { gold: 800, fruit: 400 }, immune: ["ice"], weaknesses: ["fire"],
-    passiveEffects: ["The molten parts of Hiber Conduit freeze to a solid form with little delay."],
+    name: "Hiber Conduit", health: 100_000_000, regen: 20_000, rewards: { gold: 800, fruit: 400 }, immune: ["ice"], weaknesses: ["fire"],
+    passiveEffects: ["Chipped pieces of the Hiber Conduit melt and refreeze to keep the system whole."],
   },
   {
     name: "Core Diver", health: 510_000_000, regen: 80_000, rewards: { gold: 200, fruit: 500 }, immune: ["fire"], weaknesses: ["water"],
