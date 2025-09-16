@@ -84,7 +84,7 @@ export const allEnemies: Enemy[] = [
   },
   {
     name: "The Final Warden", dodge: 0.001, health: 999_000_000, regen: 600_000, rewards: { gold: 15_000, fruit: 2500 },
-    immune: ["fire"], weaknesses: ["light", "ice"],
+    immune: ["fire", "poison"], weaknesses: ["light", "ice"],
     passiveEffects: ["The air itself is strained and torn as the colossal form of the Final Warden moves, too fast to track."],
   },
   {
