@@ -61,7 +61,8 @@ function runTo(currentTime: number) {
     }
   }
   if (enemy && store.run.room.damage < enemy.health) {
-    const regenPerSecond = multiplier * ((enemy.regen ?? 0) - store.run.room.poison);
+    const poisonMultiplier = store.run.timers["monster-Decay Manifest-ability-Waft of Decay"] ? 2 : 1;
+    const regenPerSecond = multiplier * ((enemy.regen ?? 0) - store.run.room.poison * poisonMultiplier);
     const regen = (baseTime - lastRegenTime.value) * regenPerSecond / 1000;
     if (regen > 1) {
       store.run.room.damage = Math.max(0, store.run.room.damage - Math.floor(regen));

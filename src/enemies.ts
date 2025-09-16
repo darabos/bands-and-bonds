@@ -1,4 +1,4 @@
-import type { Enemy, Ability } from "./base";
+import type { Ability, Enemy, Store } from "./base";
 
 export const allEnemies: Enemy[] = [
   { name: "Wild Slime", health: 10, rewards: { gold: 1, fruit: 1 }, weaknesses: ["fire", "ice", "left", "right"] },
@@ -97,11 +97,15 @@ export const allEnemies: Enemy[] = [
     <h1 style="margin-top: 0">Skelemasterion is ${store.run.capturedMonsters.includes('Skelemasterion') ? 'captured' : 'defeated'}!</h1>
     <div class="description">
     ${store.run.capturedMonsters.includes('Skelemasterion') ?
-        "<p>Your victory is complete. Your band organizes a feast. <p> You search Skelemasterion's lair and collect its treasures. You can force the beast to reveal its secrets now. Finally you have what you came for."
+        "<p>Your victory is complete. Your band organizes a feast. <p> You search Skelemasterion's lair and collect its treasures. You can force the beast to reveal its secrets now. Finally you learn how to access the next level of the dungeon."
         : "<p>Victory is yours. A great evil has been vanquished. Time to celebrate! <p> You search its lair and collect its treasures. Yet you miss something that only Skelemasterion could reveal..."}
     </div>`,
   },
 ];
+
+function discardMonster(store: Store, name: string) {
+  store.run.capturedMonsters = store.run.capturedMonsters.filter(m => m !== name);
+}
 
 const enemyAbilities: Record<string, Ability[]> = {
   "Wild Slime": [{ name: "Slobber", duration: 5, damage: 1, description: "Cover the enemy in slime." }],
@@ -153,18 +157,20 @@ const enemyAbilities: Record<string, Ability[]> = {
     name: "Fabric of Reality", duration: 5, damage: 120_000, tags: ['left', 'right', 'front', 'back'],
     description: "An attack that comes from all directions at once."
   }],
-  "Skeletron": [{ name: "Bonetron", duration: 1, damage: 1, description: "NOT IMPLEMENTED YET" }],
-  "Chago's Chamber": [{ name: "Spring Trap", duration: 1, damage: 1, description: "NOT IMPLEMENTED YET" }],
+  "Skeletron": [{ name: "Bonetron", duration: 2, damage: 1000, tags: ['blunt'], description: "Applies a bone to the head of the enemy." }],
+  "Chago's Chamber": [],
   "Chago": [{
     name: "Create Cheese Demon", duration: 300, description: "Chago releases a demon to chew on the enemy.",
     tags: ['bite'],
-    onCompleted(store, times) {
-      store.addPoison(160000, times);
+    onCompleted(store, times, self) {
+      const e = store.abilityEffects(self);
+      const hits = e.rndHits(times);
+      store.addPoison(160_000 * e.damageMultiplier, hits);
     },
   }],
   "Door of Loathing": [{
     name: "Look of Loathing", duration: 60, damage: 1, tags: ['dark'],
-    description: "The Door of Loathing taunts the enemy and draws its attacks onto itself."
+    description: "The Door of Loathing taunts the enemy and draws its attacks onto itself.",
   }],
   "Zakatrixos": [{
     name: "Pierce the Veil", duration: 100,
@@ -205,29 +211,98 @@ This negates the defenses of ethereal enemies.`,
     name: "Sand Bubbles", duration: 20, damage: 1_000, tags: ['sand'],
     description: "Dryfin Carps are feared across the Landas Desert for their ferocious bubble attacks.",
   }],
-  "Scaffold Sorcery": [{ name: "", duration: 1, damage: 1, description: "NOT IMPLEMENTED YET" }],
+  "Scaffold Sorcery": [{
+    name: "Collapse Scaffold", duration: 5, tags: ['blunt'],
+    description: "A single-use ability that deals significant damage to those caught under the scaffold.",
+    onCompleted(store, _times, self) {
+      const e = store.abilityEffects(self);
+      store.addDamage(12_000_000 * e.damageMultiplier, 1);
+      discardMonster(store, 'Scaffold Sorcery');
+    },
+  }],
   "Lost Swimmer": [{
     name: "Flood", duration: 100, damage: 1_000_000, tags: ['water', 'undodgeable'],
     description: "A deceptively slow attack that fills up the battlefield. No attacks can be dodged while the flood is in progress.",
   }],
-  "Geckalog": [{ name: "", duration: 1, damage: 1, description: "NOT IMPLEMENTED YET" }],
-  "Jaw Maw Maw": [{ name: "", duration: 1, damage: 1, description: "NOT IMPLEMENTED YET" }],
-  "Decay Manifest": [{ name: "", duration: 1, damage: 1, description: "NOT IMPLEMENTED YET" }],
-  "Striped Horror": [{ name: "", duration: 1, damage: 1, description: "NOT IMPLEMENTED YET" }],
-  "Dragonfly Agaric": [{ name: "", duration: 1, damage: 1, description: "NOT IMPLEMENTED YET" }],
-  "Artifact Seeker": [{ name: "", duration: 1, damage: 1, description: "NOT IMPLEMENTED YET" }],
+  "Geckalog": [{ name: "Tail Whoop", duration: 0.1, damage: 40, tags: ['blunt'], description: "A quick strike of the Geckalog's tail." }],
+  "Jaw Maw Maw": [{
+    name: "Healing Factor", duration: 1, description: "Jaw Maw Maw can restore anyone to full health, not just herself.",
+    onCompleted(store) {
+      store.run.room.damage = 0;
+    }
+  }],
+  "Gnollish Ambassador": [{
+    name: "Diplomatic Cables", duration: 12, damage: 10_000, tags: ['sharp'],
+    description: "A web of Gnollish steel wires strangle the enemy.",
+  }],
+  "Striped Horror": [
+    { name: "Ebony Stripe", tags: ['dark'], duration: 100, damage: 80_000, description: "The black stripes connect to the darkness of the underworld." },
+    { name: "Ivory Stripe", tags: ['light'], duration: 100, damage: 80_000, description: "The white stripes connect to the light of the heavens." },
+  ],
+  "Dragonfly Agaric": [{
+    name: "Agaric Poison Strike", tags: ['poison'], duration: 5, description: "The deadly poison of the Dragonfly Agaric causes great damage over time.",
+    onCompleted(store, times, self) {
+      const e = store.abilityEffects(self);
+      const hits = e.rndHits(times);
+      store.addPoison(20 * e.damageMultiplier, hits);
+    }
+  }],
+  "Artifact Seeker": [{
+    name: "Seek Artifact", duration: 10, peaceful: true, description: `
+Finds a chest containing an artifact worth a thousand pieces of <img src="images/generated/gold.webp" class="resource-icon" />.
+Have these chests always been around us?`,
+    onCompleted(store, times) {
+      store.run.gold += 1_000 * times;
+    },
+  }],
   "Golden Chest": [],
-  "King of Tadpoles": [{ name: "", duration: 1, damage: 1, description: "NOT IMPLEMENTED YET" }],
-  "Hopanoids": [{ name: "", duration: 1, damage: 1, description: "NOT IMPLEMENTED YET" }],
-  "Tosyl Rose": [{ name: "", duration: 1, damage: 1, description: "NOT IMPLEMENTED YET" }],
-  "Sullen Bearer": [{ name: "", duration: 1, damage: 1, description: "NOT IMPLEMENTED YET" }],
+  "King of Tadpoles": [{
+    name: "Recruit Tadpole", duration: 30, description: "The king sends a tadpole to battle.", tags: ['bite'],
+    onCompleted(store, times, self) {
+      const e = store.abilityEffects(self);
+      const hits = e.rndHits(times);
+      store.addPoison(60 * e.damageMultiplier, hits);
+    },
+  }],
+  "Hopanoids": [{
+    name: "Release Hopanoids", duration: 1, description: "Releasing the Hopanoids will give you a rush of speed.", peaceful: true,
+    onCompleted(store) {
+      store.run.speedLevel += 2;
+      discardMonster(store, 'Hopanoids');
+    },
+  }],
+  "Tosyl Rose": [{
+    name: "Dance of Petals", duration: 0.5, damage: 120, tags: ['sharp'],
+    description: `
+The head of the Tosyl warrior disappears in an explosion of sharp petals.
+Then a whirlwind collects all the petals and puts them back together in the shape of a rose. Beautiful and deadly.` }],
+  "Sullen Bearer": [{
+    name: "Grim Strike", duration: 100, damage: 20_000, tags: ['dark'],
+    description: "A lurching attack that seems easy to defend against. The metal of the blade can be stopped by armor. The evil of its bearer can not.",
+  }],
   "Unwelcoming Glade": [],
-  "Food Mimic": [{ name: "", duration: 1, damage: 1, description: "NOT IMPLEMENTED YET" }],
-  "Frog Assassin": [{ name: "", duration: 1, damage: 1, description: "NOT IMPLEMENTED YET" }],
-  "Enantiomers": [{ name: "", duration: 1, damage: 1, description: "NOT IMPLEMENTED YET" }],
-  "Gnollish Ambassador": [{ name: "", duration: 1, damage: 1, description: "NOT IMPLEMENTED YET" }],
+  "Food Mimic": [{
+    name: "Mimic Fruit", duration: 60, peaceful: true,
+    onCompleted(store) {
+      store.run.fruit += 1_000_000 * store.fruitMultiplier();
+      discardMonster(store, 'Food Mimic');
+    },
+    description: "The Food Mimic permanently turns into a large amount of <img src=\"images/generated/fruit.webp\" class=\"resource-icon\" />.",
+  }],
+  "Frog Assassin": [{ name: "Last Croak", duration: 2, damage: 20_000, description: "Hire a famous assassin.", consumes: { gold: 100_000 }, tags: ['sharp'] }],
+  "Enantiomers": [{
+    name: "Last Flash", duration: 10, description: "The Enantiomers cancel each other out in a final burst that increases your speed.",
+    peaceful: true,
+    onCompleted(store) {
+      store.run.speedLevel += 10;
+      discardMonster(store, 'Enantiomers');
+    }
+  }],
+  "Decay Manifest": [{
+    name: "Waft of Decay", duration: 5, description: "While this ability is active, poisoned enemies lose health twice as fast.",
+  }],
   "Web of Power": [{
-    name: "Spider Power", tags: ['poison'], duration: 0.2, damage: 100, description: "A quick, sharp stab is all that is felt."
+    name: "Spider Power", tags: ['poison'], duration: 0.2, damage: 100, description: "A quick, sharp stab is all that is felt.",
   }],
   "Tombstone of the Forgotten": [{
     name: "The Forgotten Siege", duration: 10_000, damage: 800_000_000, tags: ['dark'],
@@ -261,7 +336,7 @@ This negates the defenses of ethereal enemies.`,
       preventRepeat: true,
       onCompleted(store) {
         store.addDamage(Infinity, 1);
-        store.run.capturedMonsters = store.run.capturedMonsters.filter(m => m !== 'Skelemasterion');
+        discardMonster(store, 'Skelemasterion');
       },
     },
     {
