@@ -227,8 +227,8 @@ With the Royal Fruitwearer in your band, whenever you find fruit in the dungeon,
 In addition, any gold found is converted to fruit as well.
       `,
       passiveEffects: [
-        "When you find fruit, every member of the band gives a piece to every other member. (Thanks to the Royal Fruitwearer.)",
         "Any gold found is converted to fruit. (Thanks to the Royal Fruitwearer.)",
+        "When you find fruit, every member of the band gives a piece to every other member. (Thanks to the Royal Fruitwearer.)",
       ],
     },
   },
@@ -310,7 +310,7 @@ The Gear of Lords is the ultimate master of automation. All abilities will be ac
   {
     name: 'Kit Flash',
     cost: 0,
-    description: "A wizard of speed, Kit Flash can speed up the abilities of every member of the band.",
+    description: "A wizard of speed. Kit Flash can speed up the combat abilities of every member of the band.",
     abilities: [{
       name: "Running Start",
       duration: 10,
@@ -323,7 +323,7 @@ The Gear of Lords is the ultimate master of automation. All abilities will be ac
     }],
     super: {
       name: 'Kit Storming',
-      description: "A wizard of speed, Kit Storming can speed up the abilities of every member of the band.",
+      description: "A wizard of great speed. Kit Storming can quickly speed up the combat abilities of every member of the band.",
       abilities: [{
         name: "Running Start",
         duration: 10,
@@ -490,7 +490,7 @@ The captured enemies are kept even when the band retreats.
     cost: 0,
     description: `
 In the Landas Deserts the mages punish loud people by turning their bodies into water.
-The Eighth Swimmer was one of these unlucky people. Imagine walking among thirsty people
+The Eighth Swimmer was one of these unlucky souls. Imagine walking among thirsty people
 everyday with a body made of water.
 
 They found refuge in this dungeon and now in your band.
