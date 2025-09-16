@@ -56,19 +56,19 @@ export const allEnemies: Enemy[] = [
   { name: "Sullen Bearer", health: 990_000, armor: 10_000, rewards: { gold: 200 }, weaknesses: ["back"] },
   { name: "Unwelcoming Glade", health: 2_400_000, rewards: { gold: 100, fruit: 100, saplings: 1 }, weaknesses: ["fire", "sharp"] },
   { name: "Food Mimic", health: 3_100_000, armor: 10, rewards: { gold: 100, fruit: 120 }, weaknesses: ["blunt", "bite"] },
-  { name: "Frog Assassin", health: 1_050_000, dodge: 0.1, rewards: { gold: 1, fruit: 1 } },
-  { name: "Enantiomers", count: 2, health: 1_000_000, armor: 9_100, dodge: 0.1, rewards: { fruit: 150 }, weaknesses: ["fire"] },
+  { name: "Frog Assassin", health: 1_050_000, dodge: 0.1, rewards: { gold: 1, fruit: 1 }, weaknesses: ["ice"] },
+  { name: "Enantiomers", count: 2, health: 1_000_000, armor: 29_000, dodge: 0.1, rewards: { fruit: 150 }, weaknesses: ["fire"] },
   {
     name: "Decay Manifest", health: 2_000_000, regen: 5_000, rewards: { gold: 200, fruit: 75 }, weaknesses: ["fire", "right"],
     passiveEffects: ["The fruiting bodies of the Decay Manifest regrow as soon as you destroy them."],
   },
   { name: "Web of Power", health: 10_000_000, rewards: { gold: 2_000, fruit: 50 }, weaknesses: ["water", "left"] },
-  { name: "Tombstone of the Forgotten", health: 29_000_000, armor: 10_000, rewards: { gold: 2_000, fruit: 125 }, weaknesses: ["front", "light"] },
+  { name: "Tombstone of the Forgotten", health: 29_000_000, armor: 100_000, rewards: { gold: 2_000, fruit: 125 }, weaknesses: ["front", "light"] },
   {
     name: "Hippogryph", health: 80_000_000, regen: 10_000, rewards: { gold: 12_000, fruit: 200 }, weaknesses: ["fire", "left"],
     passiveEffects: ["The Hippogryph heals quickly."],
   },
-  { name: "The King's Armor", health: 60_000_000, armor: 100_000, rewards: { gold: 8_000 }, immune: ["sharp"], weaknesses: [] },
+  { name: "The King's Armor", health: 60_000_000, armor: 1_000_000, rewards: { gold: 8_000 }, immune: ["sharp"], weaknesses: [] },
   { name: "Corridor of Illusions", health: 6_000_000, dodge: 0.01, rewards: { gold: 6_000, fruit: 300 }, weaknesses: ["light"] },
   {
     name: "Hiber Conduit", health: 100_000_000, regen: 8_000, rewards: { gold: 800, fruit: 400 }, immune: ["ice"], weaknesses: ["fire"],
@@ -79,7 +79,7 @@ export const allEnemies: Enemy[] = [
     passiveEffects: ["A lumbering shape of magma stands before you. The Core Diver's surface is continuously shed and renewed by a fiery flow."],
   },
   {
-    name: "Smother Mother", health: 250_000_000, armor: 800_000, rewards: { gold: 200, fruit: 750 }, immune: ["fire", "light"], weaknesses: ["left", "water"],
+    name: "Smother Mother", health: 250_000_000, armor: 8_000_000, rewards: { gold: 200, fruit: 750 }, immune: ["fire", "light"], weaknesses: ["left", "water"],
     passiveEffects: ["The Smother Mother is encased in an armor that must have a melting point beyond anything in our world."],
   },
   {
