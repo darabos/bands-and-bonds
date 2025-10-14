@@ -14,14 +14,13 @@ export const allFriends: Friend[] = [
     cost: 0,
     description: `
 An expert Anvilomancer can upgrade your weapons in the midst of battle.
-Upgrades are mostly lost when leaving the dungeon.
-The starting weapon level is the square root of the highest level achieved.
+On retreat, Anvilomancer makes the square root of the temporary upgrades permanent.
     `,
     abilities: [{
       name: "Forge",
       duration: 5,
       consumes: { gold: 1 },
-      description: (store) => `Increases the level of all weapons. (Currently ${numberSpan(store.weaponLevel())}.)`,
+      description: "Increases the level of all weapons.",
       onCompleted(store, times) {
         store.run.weaponLevelAdded += times;
       },
@@ -31,14 +30,13 @@ The starting weapon level is the square root of the highest level achieved.
       name: 'Anvilominator',
       description: `
 An expert Anvilominator can upgrade your weapons in the midst of battle.
-The Anvilominator retains upgrades from earlier runs.
-The starting weapon level is the highest level achieved.
+On retreat, Anvilominator makes all temporary upgrades permanent.
     `,
       abilities: [{
         name: "Forge",
         duration: 10,
         consumes: { gold: 5 },
-        description: (store) => `Increases the level of all weapons by ${numberSpan(10)}. (Currently ${numberSpan(store.weaponLevel())}.)`,
+        description: `Increases the level of all weapons by ${numberSpan(10)}.`,
         onCompleted(store, times) {
           store.run.weaponLevelAdded += 10 * times;
         },
@@ -349,6 +347,8 @@ Just point to your destination on the map to get started.
 To repeat the run after reaching the destination, place Wayfinder at the front of your band.
 
 With Wayfinder in your band, you can replace members of your band at campfires.
+You won't be able to remove Wayfinder though.
+
 Now that Wayfinder is free, you can see more details on the map.
     `,
     passiveEffects: (store) => store.onboard("Wayfinder")!.row < 2
@@ -362,6 +362,8 @@ Just point to your destination on the map to get started.
 To repeat the run after reaching the destination, place Campfinder at the front of your band.
 
 With Campfinder in your band, you can replace members of your band at campfires.
+You won't be able to remove Campfinder though.
+
 Now that Campfinder is free, you can see more details on the map.
 
 Campfinder sets the weapons of nearby explorers on fire.
@@ -499,7 +501,7 @@ In the Landas Deserts the mages punish loud people by turning their bodies into 
 The Eighth Swimmer was one of these unlucky souls. Imagine walking among thirsty people
 everyday with a body made of water.
 
-They found refuge in this dungeon and now in your band.
+They sought refuge in this dungeon and now found it in your band.
     `,
     abilities: [{
       name: "Flood",

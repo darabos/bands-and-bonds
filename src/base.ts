@@ -68,7 +68,8 @@ export type LocalData = {
 export type TeamData = {
   fruit: number;
   packs: number;
-  bestWeaponLevel: number;
+  bestWeaponLevel?: number; // The old way — for compatibility.
+  permanentWeaponLevel?: number; // The new way.
   unlocked: string[]; // Friend names.
   discovered: string[]; // Room keys.
   name: string;
@@ -80,6 +81,7 @@ export function startingTeamData(): TeamData {
     fruit: 1,
     packs: 1,
     bestWeaponLevel: 1,
+    permanentWeaponLevel: 0,
     unlocked: ['Stick Master'],
     discovered: [],
     name: 'Unnamed Guild',
@@ -198,6 +200,7 @@ const _numberFormatInt = new Intl.NumberFormat("en-US", {
   maximumFractionDigits: 0,
 });
 export function numberFormat(x: number): string {
+  if (x < 0) return `−${numberFormat(-x)}`;
   if (x > 9_999_999_999) {
     return `${numberFormat(x / 1_000_000_000)} B`;
   }
@@ -210,7 +213,7 @@ export function costOfPacks(packs: number): number {
   return Math.floor(0.00000001 * packs ** 7 + packs);
 }
 
-export function durationFormat(durationMs: number) {
+export function durationFormat(durationMs: number): string {
   if (!durationMs) return "0 seconds";
   let duration = durationMs;
   const units = ['year', 'day', 'hour', 'minute', 'second', 'ms', 'µs', 'ns'];
@@ -220,21 +223,20 @@ export function durationFormat(durationMs: number) {
     duration /= divisors[level - 1];
     level--;
   }
-  while (level < divisors.length - 1 && duration < 1) {
+  while (level < units.length - 1 && duration < 1) {
     duration *= divisors[level];
     level++;
   }
-  if (duration < 2 && level < divisors.length - 1) {
-    const remainder = Math.round((duration - 1) * divisors[level]);
-    if (remainder === 0) {
-      return `1 ${units[level]}`;
+  const d = Math.floor(duration);
+  const plural = d === 1 || units[level].endsWith('s') ? '' : 's';
+  const lvl1 = `${numberFormat(d)} ${units[level]}${plural}`;
+  if (d < 10 && level < divisors.length) {
+    const remainder = Math.round((duration - d) * divisors[level]);
+    if (remainder > 0) {
+      const plural = remainder === 1 || units[level + 1].endsWith('s') ? '' : 's';
+      const lvl2 = `${numberFormat(remainder)} ${units[level + 1]}${plural}`;
+      return `${lvl1} ${lvl2}`;
     }
-    if (remainder === 1) {
-      return `1 ${units[level]} 1 ${units[level + 1]}`;
-    }
-    const plural = units[level + 1].endsWith('s') ? '' : 's';
-    return `1 ${units[level]} ${numberFormat(remainder)} ${units[level + 1]}${plural}`;
   }
-  const plural = units[level].endsWith('s') ? '' : 's';
-  return `${numberFormat(Math.round(duration))} ${units[level]}${plural}`;
+  return lvl1;
 }

@@ -5,7 +5,7 @@ import { store, modifiedDurationFormat } from '../store.ts';
 import Fruit from './Fruit.vue';
 import Gold from './Gold.vue';
 import Saplings from './Saplings.vue';
-import { durationFormat, type Resources } from '../base.ts';
+import { costOfPacks, durationFormat, type Resources } from '../base.ts';
 const props = defineProps({
   timerKey: { type: String, required: false },
   title: { type: String, required: true },
@@ -15,11 +15,13 @@ const props = defineProps({
   catalogMode: { type: Boolean, required: false },
   description: { type: String, required: false },
   autostart: { type: Boolean, default: false },
+  holdAutomatically: { type: Boolean, default: true },
   affectedBySpeedLevel: { type: Boolean, default: false },
   cost: { type: Object as PropType<Resources>, default: () => ({ gold: 0, fruit: 0, saplings: 0 }) },
 });
 function start() {
   if (!props.timerKey || !props.duration) return;
+  if (!affordable.value) return;
   store.startTimer(props.timerKey, {
     duration: props.duration,
     cost: props.cost,
@@ -50,6 +52,7 @@ const description = computed(() => {
   return props.description ? marked(props.description) : "";
 });
 const affordable = computed(() => {
+  if (props.timerKey === 'buy-pack') return costOfPacks(store.team.packs + 1) <= store.team.fruit;
   const aff = store.run.gold >= props.cost.gold && store.run.fruit >= props.cost.fruit && store.run.saplings >= props.cost.saplings;
   return aff;
 });
@@ -71,7 +74,7 @@ watch(pointerDown, (newVal) => {
   if (!newVal) {
     if (store.run.lastHeld === props.timerKey) {
       store.run.lastHeld = undefined;
-    } else {
+    } else if (props.holdAutomatically) {
       store.run.lastHeld = props.timerKey;
     }
   }
@@ -95,9 +98,9 @@ const baseDuration = computed(() => props.duration ? durationFormat(props.durati
 
 <template>
   <button @click="start()" @pointerdown="pointerDown = true; start();" @pointerup="pointerDown = false"
-    @blur="if (props.timerKey) store.run.lastHeld = undefined;" @pointercancel="pointerDown = false"
-    @pointerleave="pointerDown = false" :style="style()" :class="{ 'can-hold': true, disabled: !affordable || running }"
-    class="slow">
+    @blur="if (props.timerKey === store.run.lastHeld) store.run.lastHeld = undefined;"
+    @pointercancel="pointerDown = false" @pointerleave="pointerDown = false" :style="style()"
+    :class="{ 'can-hold': true, disabled: !affordable || running }" class="slow">
     <div>
       <img v-bind:src="props.image" />
       <div class="tags"><span v-for="tag in props.tags" class="tag" :class="tag"></span></div>
@@ -131,6 +134,7 @@ const baseDuration = computed(() => props.duration ? durationFormat(props.durati
 .cost {
   float: right;
   margin: 5px;
+  margin-top: 1px;
 }
 
 .cost.unaffordable {

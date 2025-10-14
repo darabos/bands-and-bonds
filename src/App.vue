@@ -4,7 +4,7 @@ import Combat from './components/Combat.vue'
 import MapPage from './components/Map.vue'
 import Band from './components/Band.vue'
 import Settings from './components/Settings.vue'
-import { store } from './store.ts'
+import { store, lastRun } from './store.ts'
 import { numberFormat, costOfPacks } from './base';
 
 const animationFrameId = ref<number | null>(null);
@@ -88,6 +88,8 @@ function runTo(currentTime: number) {
 }
 
 const fruit = computed(() => store.team.fruit + store.run.fruit - costOfPacks(store.team.packs));
+const showResources = computed(() =>
+  page.value !== 'combat' || !lastRun.value || lastRun.value.fruit === 0 && lastRun.value.weaponLevelAdded === 0);
 
 onMounted(() => {
   animationFrameId.value = requestAnimationFrame(mainLoop);
@@ -105,14 +107,18 @@ onUnmounted(() => {
     class="app">
     <div class="header">
       <div class="header-header">
-        <div id="header-gold" class="numbers">
+        <div id="header-temporary" class="numbers" :style="{ visibility: showResources ? 'visible' : 'hidden' }">
           <template v-if="store.run.gold">
             <img src="/images/generated/gold.webp" class="header-icon" />
             {{ numberFormat(store.run.gold) }}
           </template>
           <template v-if="store.run.saplings">
-            &nbsp;<img src="/images/generated/sapling.webp" class="header-icon" />
+            &nbsp; <img src="/images/generated/sapling.webp" class="header-icon" />
             {{ numberFormat(store.run.saplings) }}
+          </template>
+          <template v-if="store.run.weaponLevelAdded">
+            &nbsp; <img src="/images/generated/weapon-level-temporary.webp" class="header-icon sword-icon" />
+            {{ numberFormat(store.run.weaponLevelAdded) }}
           </template>
         </div>
         <div class="logo title">
@@ -120,8 +126,13 @@ onUnmounted(() => {
           <span style="color: #edb;">&nbsp;&&nbsp;</span>
           <img src="/images/generated/logo.webp" alt="B" />onds
         </div>
-        <div id="header-fruit" class="numbers">
-          <template v-if="fruit">{{ numberFormat(fruit) }}
+        <div id="header-permanent" class="numbers">
+          <template v-if="showResources && store.weaponLevel() - store.run.weaponLevelAdded > 1">
+            {{ numberFormat(store.weaponLevel() - store.run.weaponLevelAdded) }}
+            <img src="/images/generated/weapon-level-permanent.webp" class="header-icon sword-icon" />
+          </template>
+          <template v-if="showResources && fruit">
+            &nbsp; {{ numberFormat(fruit) }}
             <img src="/images/generated/fruit.webp" class="header-icon" title="Gold spoils. Fruit is forever." />
           </template>
           &nbsp;
@@ -177,16 +188,21 @@ onUnmounted(() => {
     vertical-align: top;
   }
 
-  #header-gold {
+  .sword-icon {
+    transform: rotate(225deg);
+    margin: 0 -7px;
+  }
+
+  #header-temporary {
     text-align: left;
   }
 
-  #header-fruit {
+  #header-permanent {
     text-align: right;
   }
 
-  #header-gold,
-  #header-fruit {
+  #header-temporary,
+  #header-permanent {
     flex: 1 1 25%;
     white-space: nowrap;
   }
@@ -203,8 +219,8 @@ onUnmounted(() => {
       flex-wrap: wrap;
     }
 
-    #header-gold,
-    #header-fruit {
+    #header-temporary,
+    #header-permanent {
       order: 2;
       flex: 1 1 50%;
     }

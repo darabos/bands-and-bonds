@@ -38,8 +38,8 @@ export const allEnemies: Enemy[] = [
   { name: "Dark Lord", health: 10_000, armor: 800, rewards: { gold: 10, fruit: 10 } },
   { name: "Clockomancer", health: 100_000, rewards: { fruit: 1000 }, slowTime: 100, passiveEffects: ["The Clockomancer slows down time."] },
 
-  { name: "Glass Dragon", health: 100_000, rewards: { gold: 100, fruit: 10 }, weaknesses: ["blunt", "back"] },
-  { name: "Xaranthian Construct", health: 650_000, rewards: { gold: 250 }, weaknesses: ["left"] },
+  { name: "Glass Dragon", health: 100_000, rewards: { gold: 20, fruit: 10 }, weaknesses: ["blunt", "back"] },
+  { name: "Xaranthian Construct", health: 450_000, rewards: { gold: 50 }, weaknesses: ["left"] },
   { name: "Potato Golem", health: 1_000, armor: 1_000, rewards: { fruit: 70, saplings: 1 }, weaknesses: ["sharp", "fire"] },
   { name: "Fortified Door", health: 100, armor: 1000, rewards: {} },
   { name: "Master of Doors", health: 1_250_000, armor: 10_000, rewards: { fruit: 30 } },
@@ -51,7 +51,7 @@ export const allEnemies: Enemy[] = [
   { name: "Door of Loathing", health: 1_000_000, armor: 10_000, immune: ['sharp', 'blunt'], rewards: { gold: 200 }, weaknesses: ["ice", "light"] },
   { name: "Zakatrixos", health: 120_000, ethereal: true, rewards: {} },
   { name: "Wands from the Depths", health: 600_000, armor: 24_000, rewards: { gold: 200, fruit: 40 }, immune: ["water"], weaknesses: ["ice"] },
-  { name: "Skyrmions", health: 107, ethereal: true, count: 107, rewards: { fruit: 107 }, weaknesses: ["back"] },
+  { name: "Skyrmions", health: 137, ethereal: true, count: 137, rewards: { fruit: 137 }, weaknesses: ["back"] },
   { name: "Defensive Installation", health: 1_000_000, armor: 1_000, rewards: { gold: 800 }, weaknesses: ["blunt", "front"] },
   { name: "Tenebra", health: 300_000, ethereal: true, rewards: { fruit: 77 }, weaknesses: ["fire", "front"] },
   { name: "Landas Wizard", health: 320_000, dodge: 0.001, rewards: { gold: 200, fruit: 100 }, weaknesses: ["water", "back"] },
@@ -64,7 +64,7 @@ export const allEnemies: Enemy[] = [
   { name: "Scaffold Sorcery", health: 20_000, armor: 1_000, rewards: { gold: 25, fruit: 6 }, weaknesses: ["fire", "sharp"] },
   { name: "Lost Swimmer", health: 30_000, armor: 2_000, rewards: { fruit: 20 }, immune: ["water"], weaknesses: ["ice"] },
 
-  { name: "Geckalog", health: 80_000, rewards: { gold: 80, fruit: 15 }, weaknesses: ["ice", "left"] },
+  { name: "Geckalog", health: 80_000, rewards: { gold: 30, fruit: 15 }, weaknesses: ["ice", "left"] },
   { name: "Jaw Maw Maw", health: 60_000, regen: 60, rewards: { gold: 60, fruit: 16 }, passiveEffects: ["Jaw Maw Maw heals quickly."] },
   { name: "Gnollish Ambassador", health: 120_000, dodge: 10, rewards: { gold: 20, fruit: 19 }, weaknesses: ["fire", "right"] },
   { name: "Striped Horror", health: 200_000, armor: 50, rewards: { gold: 10, fruit: 20 } },
@@ -175,11 +175,11 @@ const enemyAbilities: Record<string, Ability[]> = {
   }, {
     name: "Time Burp", duration: 2, description: "Pushes time forward.", peaceful: true, affectedBySpeedLevel: true,
     onCompleted(store, times) {
-      const speed = Math.log(store.run.speedLevel);
-      const factor = 1 + speed / (speed + 5);
+      const speed = store.run.speedLevel;
+      const factor = 1 + speed / (speed + 200);
       // At factor = 1 it's a 2x speedup. At factor = 2 it's theoretically infinite speedup.
-      // We gently go from 1 to 2 as the speed level grows.
-      store.run.skipTime += 1_000 * times * factor / store.run.speedLevel;
+      // The formula above gives a speedup of speed/100+2.
+      store.run.skipTime += 1_000 * times * factor / speed;
     },
   }],
   "Glass Dragon": [{ name: "Shatter", duration: 1, damage: 100_000, description: "The repairs are expensive.", consumes: { gold: 100 }, tags: ['sharp'] }],

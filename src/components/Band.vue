@@ -4,9 +4,7 @@ import SlowButton from "./SlowButton.vue";
 import { store, friendAt, nextTo, onboard } from "../store.ts";
 import * as st from "../store.ts";
 import { friendsByName } from "../friends.ts";
-import Fruit from "./Fruit.vue";
 import Packs from "./Packs.vue";
-import { costOfPacks } from "../base.ts";
 
 const selected = ref(undefined as string | undefined);
 
@@ -29,11 +27,15 @@ function set(row: number, col: number, name: string) {
   const onb = onboard(name);
   const cost = friendsByName[name]?.cost ?? 0;
   if (onb) {
+    const savedBand = { ...store.local.band };
     remove(onb.row, onb.col);
     if (store.available(row, col)) {
       store.local.band[col + row * store.local.band.width] = name;
     }
     removeUnlit();
+    if (store.run.steps > 0 && !onboard('Wayfinder')) {
+      store.local.band = savedBand;
+    }
   } else if (store.team.packs >= packsSpent.value + cost && store.available(row, col)) {
     store.local.band[col + row * store.local.band.width] = name;
   }
@@ -81,8 +83,12 @@ function friendClicked(row: number, col: number) {
   if (selected.value !== friend?.name) {
     selected.value = friend?.name;
   } else if (enabled.value) {
+    const savedBand = { ...store.local.band };
     remove(row, col);
     removeUnlit();
+    if (store.run.steps > 0 && !onboard('Wayfinder')) {
+      store.local.band = savedBand;
+    }
   }
 }
 
@@ -112,11 +118,15 @@ const bonds = computed(() => {
       if (!name) continue;
       const friend = friendsByName[name];
       const f = nextTo('Azrekta', row, col) ? friend.super ?? friend : friend;
+      const abilities = f?.abilities ?? friend.abilities ?? [];
       const image = 'chain';
       for (const nn of ['Azrekta', 'Lord of Gears', 'The Silent Song', 'Campfinder']) {
         if (nn === 'Azrekta' && !friend.super) continue;
-        if (nn === 'Lord of Gears' && !f.abilities?.some(ab => !ab.preventAutomation)) continue;
-        if (nn === 'The Silent Song' && f.name !== 'Anvilominator' && !f.name?.startsWith('Dark') && f.abilities?.every(ab => !ab.damage || ab.hidden?.(store))) continue;
+        if (nn === 'Lord of Gears' && !abilities.some(ab => !ab.preventAutomation)) continue;
+        if (
+          (nn === 'The Silent Song' || nn === 'Campfinder')
+          && f.name !== 'Anvilominator' && !f.name?.startsWith('Dark') && !f.name?.startsWith('Xaranthian')
+          && abilities.every(ab => !ab.damage || ab.hidden?.(store))) continue;
         const bond = nextTo(nn, row, col);
         if (bond) {
           bonds.push({
@@ -155,17 +165,6 @@ const unusedFriends = computed(() => {
   return unused;
 });
 
-function buyPack() {
-  const nextCost = costOfPacks(store.team.packs + 1)
-  if (store.team.fruit + store.run.fruit < nextCost) return;
-  if (store.team.fruit < nextCost) {
-    // Automatically convert run fruit to team fruit if needed.
-    store.run.fruit -= nextCost - store.team.fruit;
-    store.team.fruit = nextCost;
-  }
-  store.team.packs += 1;
-}
-
 const enabled = computed(() => {
   if (store.run.steps === 0) return true;
   if (onboard('Wayfinder')) {
@@ -178,17 +177,11 @@ const enabled = computed(() => {
 
 <template>
   <p>
-    The <u contenteditable="true">Unnamed Band</u> is assembled at a total cost of
+    Your band is assembled at a total cost of
     <Packs :amount="packsSpent" />,
     leaving you with
     <Packs :amount="store.team.packs - packsSpent" />
     to hire more members.
-    <button class="buy-pack-button" @click="buyPack()"
-      :class="{ unaffordable: store.team.fruit + store.run.fruit < costOfPacks(store.team.packs + 1) }">Buy
-      <Packs :amount="1" />
-      for
-      <Fruit :amount="costOfPacks(store.team.packs + 1) - costOfPacks(store.team.packs)" />
-    </button>
   </p>
   <div class="band-grid" :class="{ enabled, disabled: !enabled }">
     <img class="light-ring" :src="`images/generated/light-ring.webp`" :class="store.lightRadius()" />
@@ -465,15 +458,6 @@ h2 {
 
 .friend-cost {
   font-size: 18px;
-}
-
-.buy-pack-button {
-  width: auto;
-  font-size: 15px;
-}
-
-.buy-pack-button.unaffordable .numbers {
-  color: red;
 }
 
 .disabled button:hover {

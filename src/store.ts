@@ -80,6 +80,11 @@ function loadData<T extends object>(key: string, defaultValue: T): T {
 export const runData = reactive<base.RunData>(loadData('bnb-run', startingRunData()));
 export const localData = reactive<base.LocalData>(loadData('bnb-local', startingLocalData()));
 export const teamData = reactive<base.TeamData>(loadData('bnb-team', base.startingTeamData()));
+type LastRun = base.RunData & {
+  hadAnvilomancer: boolean,
+  hadAnvilominator: boolean,
+};
+export const lastRun = ref<LastRun | undefined>(undefined);
 export const store: base.Store = {
   run: runData,
   local: localData,
@@ -90,10 +95,12 @@ export const store: base.Store = {
     cost.gold ??= 0;
     cost.fruit ??= 0;
     cost.saplings ??= 0;
-    if (store.run.gold < cost.gold || store.run.fruit < cost.fruit || store.run.saplings < cost.saplings) return; // Not enough resources.
-    store.run.gold -= cost.gold || 0;
-    store.run.fruit -= cost.fruit || 0;
-    store.run.saplings -= cost.saplings || 0;
+    if (key !== 'buy-pack') {
+      if (store.run.gold < cost.gold || store.run.fruit < cost.fruit || store.run.saplings < cost.saplings) return; // Not enough resources.
+      store.run.gold -= cost.gold || 0;
+      store.run.fruit -= cost.fruit || 0;
+      store.run.saplings -= cost.saplings || 0;
+    }
     store.run.timers[key] = t;
   },
   timerFinished(key: string, t: base.Timer, times: number) {
@@ -170,10 +177,13 @@ export const store: base.Store = {
     return abilityEffects(ab);
   },
   weaponLevel() {
+    const best = store.team.bestWeaponLevel ?? 1;
+    const perm = store.team.permanentWeaponLevel ?? 0;
+    const added = store.run.weaponLevelAdded;
     if (onboard("Anvilominator")) {
-      return store.team.bestWeaponLevel + store.run.weaponLevelAdded;
+      return best + perm + added;
     }
-    return Math.floor(Math.sqrt(store.team.bestWeaponLevel)) + store.run.weaponLevelAdded;
+    return Math.floor(Math.sqrt(best)) + perm + added;
   },
 }
 
@@ -260,6 +270,7 @@ function addDamage(x: number, times: number, opts?: base.DamageOptions) {
 }
 
 function takeTurn(turn: string) {
+  lastRun.value = undefined;
   store.run.room = startingRoomData();
   store.run.steps += 1;
   if (turn !== KEEP_GOING.title) {
@@ -448,6 +459,11 @@ function findAbility(key: string): base.Ability | undefined {
   }
 }
 
+function buyPack() {
+  if (store.team.fruit < base.costOfPacks(store.team.packs + 1)) return;
+  store.team.packs += 1;
+}
+
 function timerFinished(key: string, timer: base.Timer, times: number) {
   delete store.run.timers[key];
   if (key === 'rescue-unlock') {
@@ -455,6 +471,12 @@ function timerFinished(key: string, timer: base.Timer, times: number) {
   } else if (key === 'wayfinder-turn' && plannedTurn.value?.title) {
     takePlannedTurn(plannedTurn.value.title);
     store.startTimer(key, timer);
+    return;
+  } else if (key === 'buy-pack') {
+    buyPack();
+    if (timer.automatic && store.team.fruit >= base.costOfPacks(store.team.packs + 1)) {
+      store.startTimer(key, timer);
+    }
     return;
   }
   const ab = findAbility(key);
@@ -514,13 +536,25 @@ export function retreat() {
   if (store.run.fruit) {
     store.team.fruit += store.run.fruit;
   }
-  if (store.weaponLevel() > store.team.bestWeaponLevel) {
-    store.team.bestWeaponLevel = store.weaponLevel();
+  const hadAnvilomancer = !!onboard("Anvilomancer");
+  const hadAnvilominator = !!onboard("Anvilominator");
+  {// Update weapon level.
+    const perm = store.team.permanentWeaponLevel ?? 0;
+    const added = store.run.weaponLevelAdded;
+    if (added && hadAnvilominator) {
+      store.team.permanentWeaponLevel = perm + added;
+    } else if (added && hadAnvilomancer) {
+      store.team.permanentWeaponLevel = perm + Math.floor(Math.sqrt(added));
+    }
   }
-  const capturedMonsters = store.run.capturedMonsters;
+  lastRun.value = {
+    ...store.run,
+    hadAnvilomancer,
+    hadAnvilominator,
+  };
   Object.assign(store.run, startingRunData());
   if (onboard("Monster Juggler")) {
-    store.run.capturedMonsters = capturedMonsters;
+    store.run.capturedMonsters = lastRun.value.capturedMonsters;
   }
 }
 

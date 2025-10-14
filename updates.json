@@ -1,6 +1,11 @@
 {
   "updates": [
     {
+      "version": "1.2.0",
+      "title": "Additive Forge",
+      "content": "- Score screen on retreat.\n- Anvilomancer now converts some weapon upgrades to permanent upgrades on retreat.\n- Fruit can only be purchased at the vendor by the dungeon entrance.\n- Buffed Clockomancer's ability.\n- Regeneration rate is displayed in health bar.\n- Wayfinder can't be accidentally (or otherwise) removed at campfires.\n- Better precision for speedrun timer."
+    },
+    {
       "version": "1.1.0",
       "title": "Quality of Life Improvements",
       "content": "- Display base and current damage/duration values for abilities on the Band page.\n- Display possible routes on the map.\n- The HP bar floats with you if you scroll down when you have a lot of abilities.\n- The last clicked button is held down automatically.\n- Fixed UI scaling on iPhones."

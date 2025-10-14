@@ -29,7 +29,7 @@ const tipsByFriend: { [friend: string]: Partial<Tip>[] } = {
       enabled: (store) => store.team.unlocked.includes("Bayla")
     },
     {
-      text: "This game can be played with friends online. You go on adventures individually and share the persistent progress. Check the <i>Settings</i> page. You can also use this to share progress between multiple devices.",
+      text: "This game can be played with friends online. You go on adventures individually and share the persistent progress. Check the <i>Settings</i> page. Or you can use this to share progress between multiple devices.",
       enabled: (store) => !store.local.settings.online
     },
     { text: "This game is not meant to be slow. If it feels slow, try a different band composition or go in a different direction." },
@@ -64,7 +64,7 @@ The master replied, <b>“Good. It would not fit in our stove anyway.”</b>
 <p>Sometimes I feel like gold is my firewood.
 ` },
     {
-      text: "Without Azrekta’s magic, I have to start my work over each time we enter the dungeon.",
+      text: "Without Azrekta’s magic, I can only preserve a fraction of my improvements when we leave the dungeon.",
       enabled: (store) => store.team.unlocked.includes("Azrekta") && !store.onboard("Anvilominator")
     },
     {
@@ -92,7 +92,7 @@ The master replied, <b>“Good. It would not fit in our stove anyway.”</b>
     { text: "I will take care of navigation. Let's find someone else to handle fighting.", enabled: (store) => resting(store, "Lord of Gears") },
   ],
   "Campfinder": [
-    { text: "I love camping. I love campfires. I love lighting things on fire. Like swords.", enabled: (store) => !resting(store, "Kevin") },
+    { text: "I love camping. I love campfires. I love lighting things on fire. How about flaming swords?", enabled: (store) => !resting(store, "Kevin") },
     { text: "I love camping. I love Kevin.", enabled: (store) => resting(store, "Kevin") },
   ],
   "Kevin": [

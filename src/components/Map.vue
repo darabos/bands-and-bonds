@@ -37,9 +37,10 @@ function style(room: Room, factor?: number) {
   let s = 30 * scale.value * (factor ?? 1);
   if (room.type === 'boss') {
     s *= 1.2;
-  }
-  if (room.type === 'finalboss') {
+  } else if (room.type === 'finalboss') {
     s *= 2;
+  } else {
+    s *= 0.9;
   }
   return {
     left: `${x - s / 2}px`,

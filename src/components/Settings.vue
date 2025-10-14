@@ -157,7 +157,7 @@ const unlockConfirmation = ref(0);
       </div>
     </button>
     <button @click="exportState()">
-      <img src="/images/generated/Construct Factory.webp" />
+      <img src="/images/generated/export.webp" />
       <div class="text">
         <div class="title">Export game state</div>
         <div class="description">
@@ -166,7 +166,7 @@ const unlockConfirmation = ref(0);
       </div>
     </button>
     <button @drop.prevent="importState" @dragenter.prevent @dragover.prevent>
-      <img src="/images/generated/Deploy Grower.webp" />
+      <img src="/images/generated/import.webp" />
       <div class="text">
         <div class="title">Import game state</div>
         <div class="description">

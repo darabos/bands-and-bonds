@@ -30,7 +30,10 @@ function receiveFromDatabase(payload: TeamData, store: Store) {
   if (payload.packs > store.team.packs) {
     store.team.packs = payload.packs;
   }
-  if (payload.bestWeaponLevel > store.team.bestWeaponLevel) {
+  if ((payload.permanentWeaponLevel ?? 0) > (store.team.permanentWeaponLevel ?? 0)) {
+    store.team.permanentWeaponLevel = payload.permanentWeaponLevel;
+  }
+  if ((payload.bestWeaponLevel ?? 1) > (store.team.bestWeaponLevel ?? 1)) {
     store.team.bestWeaponLevel = payload.bestWeaponLevel;
   }
   for (const x of payload.unlocked) {

@@ -3,15 +3,17 @@ import * as st from "../store.ts";
 import { friendsByName } from "../friends.ts";
 import { enemiesByName } from "../enemies.ts";
 import { roomsByKey } from "../rooms.ts";
-import { numberFormat, durationFormat, type Ability } from "../base.ts";
+import { numberFormat, durationFormat, costOfPacks, type Ability } from "../base.ts";
 import SlowButton from "./SlowButton.vue";
-import Progress from "./Progress.vue";
+import HealthBar from "./HealthBar.vue";
 import { computed, defineProps, ref, watch } from "vue";
 import EnemyRewards from "./EnemyRewards.vue";
 import Fruit from "./Fruit.vue";
 import Num from "./Num.vue";
 import Victory from "./Victory.vue";
 import { allTips, type Tip } from "../tips.ts";
+import RetreatResults from "./RetreatResults.vue";
+import WeaponLevel from "./WeaponLevel.vue";
 const props = defineProps<{
   testMode: boolean;
 }>();
@@ -127,6 +129,7 @@ function slowButtonProps(ab: Ability) {
     autostart: ab.automatic,
     affectedBySpeedLevel: ab.affectedBySpeedLevel ?? !ab.peaceful,
     tags: st.onboard('Desert Rabbit') && st.abilityTags(ab),
+    holdAutomatically: !ab.preventAutomation,
   };
 }
 
@@ -206,8 +209,9 @@ for (const enemy of Object.values(enemiesByName)) {
   </div>
   <div class="enemy-sticky"
     v-if="enemy && (!enemy.eulogy || enemy.health > store.run.room.damage || store.run.timers.celebrating)">
-    <Progress :value="enemy.health - store.run.room.damage" :max="enemy.health" color="#c00" label="HP" />
-    <Progress v-if="enemy.armor" :value="enemy.armor - store.run.room.armorDamage" :max="enemy.armor" color="#666"
+    <HealthBar :value="enemy.health - store.run.room.damage" :max="enemy.health" color="#c00" label="HP"
+      :regen="enemy.regen" />
+    <HealthBar v-if="enemy.armor" :value="enemy.armor - store.run.room.armorDamage" :max="enemy.armor" color="#666"
       label="Armor" title="Armor is subtracted from damage" />
   </div>
   <Transition mode="out-in" :duration="props.testMode ? 0 : undefined">
@@ -216,7 +220,7 @@ for (const enemy of Object.values(enemiesByName)) {
         class="friend" />
       <h1>{{ st.justRescued.value?.name }}</h1>
       <p class="description is-rescued" style="margin-top: 0; text-align: center; color: #edb;">is rescued!</p>
-      <div class="description" v-html="st.justRescued.value?.descriptionHtml"></div>
+      <div class="description" style="margin-bottom: 15px;" v-html="st.justRescued.value?.descriptionHtml"></div>
       <div class="abilities" v-for="ab in st.justRescued.value?.abilities" :key="ab.name">
         <SlowButton :title="ab.name"
           :display-duration="typeof ab.duration === 'number' ? 1000 * ab.duration : undefined"
@@ -245,6 +249,7 @@ for (const enemy of Object.values(enemiesByName)) {
   <div class="passive-effect" v-for="effect in passiveEffects" v-html="effect" />
   <Victory :show="!!store.run.timers.celebrating" @on-start="hideActions = true;" @on-end="hideActions = false;"
     :skelemasterion="enemy?.name === 'Skelemasterion'" />
+  <RetreatResults />
   <div class="actions" v-show="!hideActions">
     <template v-for="ab in st.abilities.value" :key="ab.name">
       <SlowButton v-if="store.run.steps > 0 && (fighting || ab.peaceful)" :timer-key="`ability-${ab.name}`"
@@ -282,14 +287,27 @@ for (const enemy of Object.values(enemiesByName)) {
         </div>
       </button>
     </template>
-    <button @click="retreat()" @blur="retreatConfirmation = false" accesskey="r" v-if="store.run.steps > 0">
+    <button @click="retreat()" @blur="retreatConfirmation = false" accesskey="r"
+      v-if="store.run.steps > 0 && st.plannedTurn.value?.title !== 'Retreat'">
       <img src="/images/generated/Retreat.webp" />
       <div class="text">
         <div class="title">Retreat</div>
         <div class="description">
           <p>
             Leave the dungeon and return to safety.
-            <template v-if="store.run.fruit > 0">
+            <template v-if="store.run.fruit > 0 && store.run.weaponLevelAdded > 0 && st.onboard('Anvilominator')">
+              You start over, but keep the
+              <Fruit :amount="store.run.fruit" /> you've collected.
+              Anvilominator will make
+              <WeaponLevel :amount="store.run.weaponLevelAdded" :permanent="false" /> permanent.
+            </template>
+            <template v-else-if="store.run.fruit > 0 && store.run.weaponLevelAdded > 0 && st.onboard('Anvilomancer')">
+              You start over, but keep the
+              <Fruit :amount="store.run.fruit" /> you've collected.
+              Anvilomancer will make
+              <WeaponLevel :amount="Math.floor(Math.sqrt(store.run.weaponLevelAdded))" :permanent="false" /> permanent.
+            </template>
+            <template v-else-if="store.run.fruit > 0">
               You start over, but keep the
               <Fruit :amount="store.run.fruit" /> you've collected.
               Spend it on your band!
@@ -299,6 +317,12 @@ for (const enemy of Object.values(enemiesByName)) {
         </div>
       </div>
     </button>
+    <SlowButton v-if="store.run.steps === 0 && store.team.fruit > 1" timer-key="buy-pack" :duration="300"
+      title="Buy Provisions" description="
+A trader by the dungeon's entrance offers you
+<span class='numbers'>1&nbsp;<img src='images/generated/pack.webp' class='resource-icon' /></span>.
+    " image="images/generated/Buy Pack.webp" :automatic="true"
+      :cost="{ fruit: costOfPacks(store.team.packs + 1) - costOfPacks(store.team.packs), gold: 0, saplings: 0 }" />
   </div>
 </template>
 
@@ -466,10 +490,6 @@ for (const enemy of Object.values(enemiesByName)) {
   h1 {
     margin-top: -15px;
     margin-bottom: 0px;
-  }
-
-  .abilities {
-    margin-top: 15px;
   }
 }
 
