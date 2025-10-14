@@ -1,0 +1,9 @@
+{
+  "updates": [
+    {
+      "version": "1.1.0",
+      "title": "Quality of Life Improvements",
+      "content": "- Display base and current damage/duration values for abilities on the Band page.\n- Display possible routes on the map.\n- The HP bar floats with you if you scroll down when you have a lot of abilities.\n- The last clicked button is held down automatically.\n- Fixed UI scaling on iPhones."
+    }
+  ]
+}
