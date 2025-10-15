@@ -263,6 +263,7 @@ This negates the defenses of ethereal enemies.`,
   "Scaffold Sorcery": [{
     name: "Collapse Scaffold", duration: 5, tags: ['blunt'],
     description: "A single-use ability that deals significant damage to those caught under the scaffold.",
+    damage: 12_000_000,
     onCompleted(store, _times, self) {
       const e = store.abilityEffects(self);
       store.addDamage(12_000_000 * e.damageMultiplier, 1);
