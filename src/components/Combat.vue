@@ -250,79 +250,84 @@ for (const enemy of Object.values(enemiesByName)) {
   <Victory :show="!!store.run.timers.celebrating" @on-start="hideActions = true;" @on-end="hideActions = false;"
     :skelemasterion="enemy?.name === 'Skelemasterion'" />
   <RetreatResults />
-  <div class="actions" v-show="!hideActions">
-    <template v-for="ab in st.abilities.value" :key="ab.name">
-      <SlowButton v-if="store.run.steps > 0 && (fighting || ab.peaceful)" :timer-key="`ability-${ab.name}`"
-        v-bind="slowButtonProps(ab)" />
-    </template>
-    <div v-if="store.run.capturedMonsters.length > 0" class="section">Captured Monsters</div>
-    <template v-for="monster in store.run.capturedMonsters" :key="monster">
-      <template v-for="ab in enemiesByName[monster].abilities" :key="ab.name">
-        <SlowButton v-if="store.run.steps > 0 && (fighting || ab.peaceful)"
-          :timer-key="`monster-${monster}-ability-${ab.name}`" v-bind="slowButtonProps(ab)" />
+  <div v-show="!hideActions" style="width: 100%;">
+    <div class=" actions">
+      <template v-for="ab in st.abilities.value" :key="ab.name">
+        <SlowButton v-if="store.run.steps > 0 && (fighting || ab.peaceful)" :timer-key="`ability-${ab.name}`"
+          v-bind="slowButtonProps(ab)" />
       </template>
-    </template>
-    <template v-if="fighting">
-      <div class="section">Navigation</div>
-    </template>
-    <SlowButton v-else-if="st.rescueAvailable.value" timer-key="rescue-unlock" :duration="8000" title="Rescue prisoner"
-      description="Release the poor creature." image="images/generated/rescue-unlock.webp" />
-    <template v-else-if="st.plannedTurn.value">
-      <div class="section">Navigation</div>
-      <SlowButton v-if="!hideActions" timer-key="wayfinder-turn" :duration="1000" :title="st.plannedTurn.value?.title!"
-        :description="st.plannedTurn.value?.description" :image="`images/generated/${st.plannedTurn.value?.title}.webp`"
-        :autostart="true" />
-    </template>
-    <template v-else>
-      <div class="section">Navigation</div>
-      <button v-for="turn in possibleTurns" :key="turn.title" @click="store.takeTurn(turn.title!)">
-        <img
-          :src="`images/generated/${(turn.leadsTo && store.team.discovered.includes(turn.leadsTo)) ? roomsByKey[turn.leadsTo].name : turn.title}.webp`"
-          :class="{ 'turn': true, 'leads-to': turn.leadsTo && store.team.discovered.includes(turn.leadsTo) }" />
+    </div>
+    <div class="section">Captured Monsters</div>
+    <div class="actions" v-if="store.run.capturedMonsters.length > 0">
+      <template v-for="monster in store.run.capturedMonsters" :key="monster">
+        <template v-for="ab in enemiesByName[monster].abilities" :key="ab.name">
+          <SlowButton v-if="store.run.steps > 0 && (fighting || ab.peaceful)"
+            :timer-key="`monster-${monster}-ability-${ab.name}`" v-bind="slowButtonProps(ab)" />
+        </template>
+      </template>
+    </div>
+    <div class="section">Navigation</div>
+    <div class="actions">
+      <template v-if="fighting">
+      </template>
+      <SlowButton v-else-if="st.rescueAvailable.value" timer-key="rescue-unlock" :duration="8000"
+        title="Rescue prisoner" description="Release the poor creature." image="images/generated/rescue-unlock.webp" />
+      <template v-else-if="st.plannedTurn.value">
+        <SlowButton v-if="!hideActions" timer-key="wayfinder-turn" :duration="1000"
+          :title="st.plannedTurn.value?.title!" :description="st.plannedTurn.value?.description"
+          :image="`images/generated/${st.plannedTurn.value?.title}.webp`" :autostart="true" />
+      </template>
+      <template v-else>
+        <button v-for="turn in possibleTurns" :key="turn.title" @click="store.takeTurn(turn.title!)">
+          <img
+            :src="`images/generated/${(turn.leadsTo && store.team.discovered.includes(turn.leadsTo)) ? roomsByKey[turn.leadsTo].name : turn.title}.webp`"
+            :class="{ 'turn': true, 'leads-to': turn.leadsTo && store.team.discovered.includes(turn.leadsTo) }" />
+          <div class="text">
+            <div class="title">{{ turn.title }}</div>
+            <div class="description">
+              <p>{{ turn.description }}</p>
+            </div>
+          </div>
+        </button>
+      </template>
+      <button @click="retreat()" @blur="retreatConfirmation = false" accesskey="r"
+        v-if="store.run.steps > 0 && st.plannedTurn.value?.title !== 'Retreat'">
+        <img src="/images/generated/Retreat.webp" />
         <div class="text">
-          <div class="title">{{ turn.title }}</div>
+          <div class="title">Retreat</div>
           <div class="description">
-            <p>{{ turn.description }}</p>
+            <p>
+              Leave the dungeon and return to safety.
+              <template v-if="store.run.fruit > 0 && store.run.weaponLevelAdded > 0 && st.onboard('Anvilominator')">
+                You start over, but keep the
+                <Fruit :amount="store.run.fruit" /> you've collected.
+                Anvilominator will make
+                <WeaponLevel :amount="store.run.weaponLevelAdded" :permanent="false" /> permanent.
+              </template>
+              <template v-else-if="store.run.fruit > 0 && store.run.weaponLevelAdded > 0 && st.onboard('Anvilomancer')">
+                You start over, but keep the
+                <Fruit :amount="store.run.fruit" /> you've collected.
+                Anvilomancer will make
+                <WeaponLevel :amount="Math.floor(Math.sqrt(store.run.weaponLevelAdded))" :permanent="false" />
+                permanent.
+              </template>
+              <template v-else-if="store.run.fruit > 0">
+                You start over, but keep the
+                <Fruit :amount="store.run.fruit" /> you've collected.
+                Spend it on your band!
+              </template>
+            </p>
+            <p v-if="retreatConfirmation">Click again to confirm.</p>
           </div>
         </div>
       </button>
-    </template>
-    <button @click="retreat()" @blur="retreatConfirmation = false" accesskey="r"
-      v-if="store.run.steps > 0 && st.plannedTurn.value?.title !== 'Retreat'">
-      <img src="/images/generated/Retreat.webp" />
-      <div class="text">
-        <div class="title">Retreat</div>
-        <div class="description">
-          <p>
-            Leave the dungeon and return to safety.
-            <template v-if="store.run.fruit > 0 && store.run.weaponLevelAdded > 0 && st.onboard('Anvilominator')">
-              You start over, but keep the
-              <Fruit :amount="store.run.fruit" /> you've collected.
-              Anvilominator will make
-              <WeaponLevel :amount="store.run.weaponLevelAdded" :permanent="false" /> permanent.
-            </template>
-            <template v-else-if="store.run.fruit > 0 && store.run.weaponLevelAdded > 0 && st.onboard('Anvilomancer')">
-              You start over, but keep the
-              <Fruit :amount="store.run.fruit" /> you've collected.
-              Anvilomancer will make
-              <WeaponLevel :amount="Math.floor(Math.sqrt(store.run.weaponLevelAdded))" :permanent="false" /> permanent.
-            </template>
-            <template v-else-if="store.run.fruit > 0">
-              You start over, but keep the
-              <Fruit :amount="store.run.fruit" /> you've collected.
-              Spend it on your band!
-            </template>
-          </p>
-          <p v-if="retreatConfirmation">Click again to confirm.</p>
-        </div>
-      </div>
-    </button>
-    <SlowButton v-if="store.run.steps === 0 && store.team.fruit > 1" timer-key="buy-pack" :duration="300"
-      title="Buy Provisions" description="
+      <SlowButton v-if="store.run.steps === 0 && store.team.fruit > 1" timer-key="buy-pack" :duration="300"
+        title="Buy Provisions" description="
 A trader by the dungeon's entrance offers you
 <span class='numbers'>1&nbsp;<img src='images/generated/pack.webp' class='resource-icon' /></span>.
     " image="images/generated/Buy Pack.webp" :automatic="true"
-      :cost="{ fruit: costOfPacks(store.team.packs + 1) - costOfPacks(store.team.packs), gold: 0, saplings: 0 }" />
+        :cost="{ fruit: costOfPacks(store.team.packs + 1) - costOfPacks(store.team.packs), gold: 0, saplings: 0 }" />
+    </div>
   </div>
 </template>
 
@@ -505,26 +510,50 @@ A trader by the dungeon's entrance offers you
 }
 
 .actions {
-  margin: 20px 0;
+  margin: 20px auto;
   columns: 310px auto;
   width: 100%;
+  display: none;
+}
 
-  .section {
-    display: block;
-    color: #edb;
-    break-after: avoid;
-  }
-
-  .section:before,
-  .section:after {
-    content: ' — ';
-  }
+.actions:has(*) {
+  display: block;
 }
 
 .actions>* {
   display: flex;
   margin: 0 auto;
   margin-bottom: 10px;
+}
+
+.actions:has(> :nth-child(1):last-child),
+.actions:has(> :nth-child(2):last-child) {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: start;
+  gap: 1rem;
+
+  >* {
+    display: flex;
+    margin: 0;
+  }
+}
+
+.section {
+  display: none;
+  color: #edb;
+  break-after: avoid;
+  margin-top: 10px;
+}
+
+.section:has(+ .actions) {
+  display: block;
+}
+
+.section:before,
+.section:after {
+  content: ' — ';
 }
 
 .passive-effect {
