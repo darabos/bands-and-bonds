@@ -5,6 +5,7 @@ import { store, friendAt, nextTo, onboard } from "../store.ts";
 import * as st from "../store.ts";
 import { friendsByName } from "../friends.ts";
 import Packs from "./Packs.vue";
+import TagLegend from "./TagLegend.vue";
 
 const selected = ref(undefined as string | undefined);
 
@@ -268,6 +269,7 @@ const enabled = computed(() => {
       <img class="friend" :src="`images/generated/${selectedFriend.name}.webp`" />
       <h1>{{ selectedFriend.name }}</h1>
       <div class="description" v-html="selectedFriend.descriptionHtml"></div>
+      <TagLegend v-if="selectedFriend.name === 'Desert Rabbit' || selectedFriend.name === 'Desert Armadillo'" />
       <template v-for="ab in selectedFriend.abilities" :key="ab.name">
         <SlowButton :title="ab.name" :catalog-mode="true"
           :description="st.describeAbility(ab, st.abilityEffects(ab), true)" :duration="st.abilityDuration(ab) * 1000"

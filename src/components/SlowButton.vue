@@ -1,23 +1,28 @@
 <script setup lang="ts">
 import { marked } from 'marked';
-import { computed, onUnmounted, ref, watch, type PropType } from 'vue';
+import { computed, onUnmounted, ref, watch } from 'vue';
 import { store, modifiedDurationFormat } from '../store.ts';
 import Fruit from './Fruit.vue';
 import Gold from './Gold.vue';
+import TagsWithTooltip from './TagsWithTooltip.vue';
 import Saplings from './Saplings.vue';
 import { costOfPacks, durationFormat, type Resources } from '../base.ts';
-const props = defineProps({
-  timerKey: { type: String, required: false },
-  title: { type: String, required: true },
-  tags: { type: Array, required: false },
-  image: { type: String, required: true },
-  duration: { type: Number, required: false },
-  catalogMode: { type: Boolean, required: false },
-  description: { type: String, required: false },
-  autostart: { type: Boolean, default: false },
-  holdAutomatically: { type: Boolean, default: true },
-  affectedBySpeedLevel: { type: Boolean, default: false },
-  cost: { type: Object as PropType<Resources>, default: () => ({ gold: 0, fruit: 0, saplings: 0 }) },
+const props = withDefaults(defineProps<{
+  timerKey?: string,
+  title: string,
+  tags?: Array<string>,
+  image: string,
+  duration?: number,
+  catalogMode?: boolean,
+  description?: string,
+  autostart?: boolean,
+  holdAutomatically?: boolean,
+  affectedBySpeedLevel?: boolean,
+  cost?: Resources,
+}>(), {
+  holdAutomatically: true,
+  affectedBySpeedLevel: false,
+  cost: () => ({ gold: 0, fruit: 0, saplings: 0 }),
 });
 function start() {
   if (!props.timerKey || !props.duration) return;
@@ -103,7 +108,7 @@ const baseDuration = computed(() => props.duration ? durationFormat(props.durati
     :class="{ 'can-hold': true, disabled: !affordable || running }" class="slow">
     <div>
       <img v-bind:src="props.image" />
-      <div class="tags"><span v-for="tag in props.tags" class="tag" :class="tag"></span></div>
+      <TagsWithTooltip :tags="props.tags" />
     </div>
     <div class="text">
       <div class="cost" v-if="props.cost.gold > 0" :class="{ unaffordable: !affordable && !running }">
